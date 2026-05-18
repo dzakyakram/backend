@@ -36,7 +36,13 @@ return new class extends Migration
             CREATE OR REPLACE FUNCTION sync_location_geom()
             RETURNS TRIGGER AS \$\$
             BEGIN
-                NEW.geom := ST_SetSRID(ST_MakePoint(NEW.longitude, NEW.latitude), 4326);
+                NEW.geom := extensions.ST_SetSRID(
+                    extensions.ST_MakePoint(
+                        NEW.longitude::double precision,
+                        NEW.latitude::double precision
+                    ),
+                    4326
+                );
                 RETURN NEW;
             END;
             \$\$ LANGUAGE plpgsql;
