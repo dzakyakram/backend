@@ -29,7 +29,7 @@ return new class extends Migration
         });
 
         // Tambahkan kolom geometry PostGIS
-        DB::statement('ALTER TABLE locations ADD COLUMN geom GEOMETRY(Point, 4326)');
+        DB::statement('ALTER TABLE locations ADD COLUMN geom extensions.geometry(Point, 4326)');
 
         // Trigger: auto-update geom dari latitude/longitude
         DB::statement("
