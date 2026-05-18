@@ -5,7 +5,7 @@
 
 use App\Http\Controllers\Api\AuthApiController;
 use App\Http\Controllers\Api\BookmarkController;
-use App\Http\Controllers\Api\LocationapiController;
+use App\Http\Controllers\Api\LocationApiController;
 use Illuminate\Support\Facades\Route;
 
 /*
