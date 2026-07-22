@@ -187,7 +187,7 @@
     {{-- DOWNLOAD APP --}}
     <div style="margin-top:28px;padding-top:20px;border-top:2px solid var(--black);">
       <div style="font-size:9px;font-weight:700;letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:10px;">
-        // DOWNLOAD APLIKASI
+        DOWNLOAD APLIKASI
       </div>
 
       <div style="display:grid;gap:10px;">
