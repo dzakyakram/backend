@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Services\SupabaseStorageService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
 class DebugController extends Controller
@@ -25,15 +23,12 @@ class DebugController extends Controller
 
     public function testUpload()
     {
-        $result = ['step' => '', 'ok' => false, 'detail' => ''];
+        $result = ['step' => '', 'ok' => false];
 
         try {
-            $supabase = app(SupabaseStorageService::class);
-
             $tmpFile = tempnam(sys_get_temp_dir(), 'test_');
-            imagejpeg(imagecreatetruecolor(10, 10), $tmpFile);
-            $result['step'] = 'created test image';
-            $result['tmp_file'] = $tmpFile;
+            file_put_contents($tmpFile, str_repeat("\xFF\xD8\xFF\xE0", 1000));
+            $result['step'] = 'created test file';
 
             $response = Http::withoutVerifying()
                 ->timeout(15)
@@ -67,7 +62,7 @@ class DebugController extends Controller
         } catch (\Throwable $e) {
             $result['exception'] = get_class($e);
             $result['message'] = $e->getMessage();
-            $result['step'] = 'error at: ' . ($result['step'] ?? 'unknown');
+            $result['step'] = 'error: ' . ($result['step'] ?? 'unknown');
         }
 
         return response()->json($result, $result['ok'] ? 200 : 500);
