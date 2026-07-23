@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Location;
+use App\Services\SupabaseStorageService;
 use Illuminate\Http\Request;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
@@ -111,11 +111,12 @@ class LocationApiController extends Controller
             'foto'      => 'required|image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
-        // Upload foto ke Cloudinary
-        $upload = Cloudinary::upload($request->file('foto')->getRealPath(), [
-            'folder'         => 'nusantaramap/locations',
-            'transformation' => ['quality' => 'auto', 'fetch_format' => 'auto'],
-        ]);
+        $supabase = app(SupabaseStorageService::class);
+        $file     = $request->file('foto');
+        $ext      = $file->getClientOriginalExtension();
+        $path     = 'locations/' . uniqid() . '.' . $ext;
+
+        $upload = $supabase->upload($file->getRealPath(), config('supabase.bucket'), $path);
 
         $location = Location::create([
             'nama'          => $request->nama,
@@ -124,8 +125,8 @@ class LocationApiController extends Controller
             'alamat'        => $request->alamat,
             'latitude'      => $request->latitude,
             'longitude'     => $request->longitude,
-            'foto_url'      => $upload->getSecurePath(),
-            'foto_public_id'=> $upload->getPublicId(),
+            'foto_url'      => $upload['url'],
+            'foto_public_id'=> $upload['path'],
             'user_id'       => auth()->id(),
             'status'        => 'pending',
         ]);
@@ -162,7 +163,8 @@ class LocationApiController extends Controller
         $location = Location::where('user_id', auth()->id())->findOrFail($id);
 
         if ($location->foto_public_id) {
-            Cloudinary::destroy($location->foto_public_id);
+            $supabase = app(SupabaseStorageService::class);
+            $supabase->delete($location->foto_public_id);
         }
 
         $location->delete();

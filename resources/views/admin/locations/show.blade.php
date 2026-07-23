@@ -144,7 +144,7 @@
       <form method="POST" action="{{ route('admin.locations.destroy', $location) }}" id="del-loc-show">
         @csrf @method('DELETE')
         <button type="button" class="btn btn-red" style="width:100%;justify-content:center;font-size:11px;letter-spacing:1px;"
-          onclick="brutConfirm(document.getElementById('del-loc-show'),'HAPUS LOKASI PERMANEN','Hapus '+{{ Js::from($location->nama) }}+' secara permanen? Foto di Cloudinary juga akan terhapus.','🗑')">
+          onclick="brutConfirm(document.getElementById('del-loc-show'),'HAPUS LOKASI PERMANEN','Hapus '+{{ Js::from($location->nama) }}+' secara permanen? Foto juga akan terhapus secara permanen.','🗑')">
           &#128465; HAPUS LOKASI PERMANEN
         </button>
       </form>

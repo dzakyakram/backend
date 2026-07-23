@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Location;
+use App\Services\SupabaseStorageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -55,6 +56,11 @@ class LocationController extends Controller
 
     public function destroy(Location $location)
     {
+        if ($location->foto_public_id) {
+            $supabase = app(SupabaseStorageService::class);
+            $supabase->delete($location->foto_public_id);
+        }
+
         $location->delete();
         return redirect()->route('admin.locations.index')
             ->with('success', 'Lokasi berhasil dihapus.');
