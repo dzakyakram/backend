@@ -29,12 +29,16 @@ class SupabaseStorageService
             );
         }
 
+        $mimeType = mime_content_type($filePath) ?: 'application/octet-stream';
+
         $response = Http::withoutVerifying()
             ->timeout(30)
             ->withHeaders([
                 'Authorization' => "Bearer {$this->key}",
+                'apikey'        => $this->key,
+                'x-upsert'      => 'true',
             ])
-            ->attach('file', file_get_contents($filePath), basename($filePath))
+            ->withBody(file_get_contents($filePath), $mimeType)
             ->put("{$this->url}/storage/v1/object/{$bucket}/{$destination}");
 
         if ($response->failed()) {

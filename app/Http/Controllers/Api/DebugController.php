@@ -34,8 +34,10 @@ class DebugController extends Controller
                 ->timeout(15)
                 ->withHeaders([
                     'Authorization' => 'Bearer ' . config('supabase.key'),
+                    'apikey'        => config('supabase.key'),
+                    'x-upsert'      => 'true',
                 ])
-                ->attach('file', file_get_contents($tmpFile), 'test.jpg')
+                ->withBody(file_get_contents($tmpFile), 'image/jpeg')
                 ->put(config('supabase.url') . '/storage/v1/object/' . config('supabase.bucket') . '/test/upload-check.jpg');
 
             @unlink($tmpFile);
