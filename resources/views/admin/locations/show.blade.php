@@ -140,7 +140,6 @@
 
     {{-- Hapus --}}
     <div style="border:3px solid var(--black);padding:16px;">
-      <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:#888;margin-bottom:10px;">// ZONA BAHAYA</div>
       <form method="POST" action="{{ route('admin.locations.destroy', $location) }}" id="del-loc-show">
         @csrf @method('DELETE')
         <button type="button" class="btn btn-red" style="width:100%;justify-content:center;font-size:11px;letter-spacing:1px;"
