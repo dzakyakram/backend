@@ -69,4 +69,29 @@ class DebugController extends Controller
 
         return response()->json($result, $result['ok'] ? 200 : 500);
     }
+
+    // GET /api/v1/debug/dns-check
+    public function dnsCheck()
+    {
+        $hosts = [
+            'google.com',
+            'api.github.com',
+            'supabase.com',
+            parse_url(config('supabase.url'), PHP_URL_HOST) ?? 'NULL_SUPABASE_URL',
+        ];
+
+        $results = [];
+        foreach ($hosts as $host) {
+            $ip = @gethostbyname($host);
+            $results[$host] = [
+                'resolved' => $ip !== $host,
+                'ip'       => $ip,
+            ];
+        }
+
+        return response()->json([
+            'server_time' => now()->toDateTimeString(),
+            'dns_results' => $results,
+        ]);
+    }
 }

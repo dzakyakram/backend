@@ -20,6 +20,7 @@ Route::prefix('v1')->group(function () {
     // ── Debug (HAPUS SETELAH VERIFIKASI) ──────────────────────
     Route::get('debug/config',      [DebugController::class, 'config']);
     Route::get('debug/test-upload', [DebugController::class, 'testUpload']);
+    Route::get('debug/dns-check',   [DebugController::class, 'dnsCheck']);
 
     // ── Auth (tanpa token) ────────────────────────────────────
     Route::prefix('auth')->group(function () {
