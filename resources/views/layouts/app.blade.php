@@ -64,8 +64,8 @@
   .brut-input:focus { box-shadow: 4px 4px 0 var(--black); }
   .brut-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%230a0a0a' stroke-width='3'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
 
-  .flash-success { background: var(--green); border: var(--border); box-shadow: var(--shadow); padding: 12px 16px; font-size: 13px; font-weight: 700; margin-bottom: 16px; }
-  .flash-error   { background: var(--red);   border: var(--border); box-shadow: var(--shadow); padding: 12px 16px; font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 16px; }
+.flash-success { background: var(--green); border: var(--border); box-shadow: var(--shadow); padding: 12px 16px; font-size: 13px; font-weight: 700; margin-bottom: 16px; transition: opacity 0.4s ease; }
+.flash-error   { background: var(--red);   border: var(--border); box-shadow: var(--shadow); padding: 12px 16px; font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 16px; transition: opacity 0.4s ease; }
 
   ::-webkit-scrollbar { width: 8px; }
   ::-webkit-scrollbar-track { background: #e8e4d8; border-left: 2px solid var(--black); }
@@ -284,6 +284,18 @@
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+  var flashDivs = document.querySelectorAll('.flash-success, .flash-error');
+  if (flashDivs.length) {
+    setTimeout(function() {
+      flashDivs.forEach(function(el) {
+        el.style.opacity = '0';
+        setTimeout(function() { el.remove(); }, 400);
+      });
+    }, 4000);
+  }
+});
+
 function toggleSidebar() {
   const s = document.getElementById('sidebar');
   const o = document.getElementById('sidebarOverlay');
