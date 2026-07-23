@@ -5,7 +5,13 @@ nixPkgs = ["php82", "php82Extensions.pdo_pgsql", "php82Extensions.mbstring", "ph
 cmds = ["composer install --no-dev --optimize-autoloader"]
 
 [phases.build]
-cmds = ["php artisan config:cache", "php artisan route:cache", "php artisan view:cache", "php artisan migrate --force"]
+cmds = [
+  "php -r \"file_put_contents('/tmp/php-upload.ini', 'upload_max_filesize=10M'.PHP_EOL.'post_max_size=12M'.PHP_EOL.'memory_limit=256M'.PHP_EOL);\"",
+  "php -c /tmp/php-upload.ini artisan config:cache",
+  "php -c /tmp/php-upload.ini artisan route:cache",
+  "php -c /tmp/php-upload.ini artisan view:cache",
+  "php artisan migrate --force"
+]
 
 [start]
-cmd = "php artisan serve --host=0.0.0.0 --port=$PORT"
+cmd = "php -c /tmp/php-upload.ini artisan serve --host=0.0.0.0 --port=$PORT"

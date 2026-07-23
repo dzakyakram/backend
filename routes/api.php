@@ -5,6 +5,7 @@
 
 use App\Http\Controllers\Api\AuthApiController;
 use App\Http\Controllers\Api\BookmarkController;
+use App\Http\Controllers\Api\DebugController;
 use App\Http\Controllers\Api\LocationApiController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,15 +18,8 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->group(function () {
 
     // ── Debug (HAPUS SETELAH VERIFIKASI) ──────────────────────
-    Route::get('debug/config', function () {
-        return response()->json([
-            'supabase_url'   => config('supabase.url') ?? 'NULL - TIDAK TERBACA',
-            'supabase_key'   => config('supabase.key') ? '✓ ada' : 'NULL - TIDAK TERBACA',
-            'supabase_bucket'=> config('supabase.bucket') ?? 'NULL - TIDAK TERBACA',
-            'php_version'    => phpversion(),
-            'laravel_version'=> app()->version(),
-        ]);
-    });
+    Route::get('debug/config',      [DebugController::class, 'config']);
+    Route::get('debug/test-upload', [DebugController::class, 'testUpload']);
 
     // ── Auth (tanpa token) ────────────────────────────────────
     Route::prefix('auth')->group(function () {

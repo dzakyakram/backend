@@ -1,0 +1,75 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Services\SupabaseStorageService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+
+class DebugController extends Controller
+{
+    public function config()
+    {
+        return response()->json([
+            'supabase_url'    => config('supabase.url') ?? 'NULL',
+            'supabase_key'    => config('supabase.key') ? 'ada' : 'NULL',
+            'supabase_bucket' => config('supabase.bucket') ?? 'NULL',
+            'php_version'     => phpversion(),
+            'laravel_version' => app()->version(),
+            'upload_max'      => ini_get('upload_max_filesize'),
+            'post_max'        => ini_get('post_max_size'),
+            'memory_limit'    => ini_get('memory_limit'),
+        ]);
+    }
+
+    public function testUpload()
+    {
+        $result = ['step' => '', 'ok' => false, 'detail' => ''];
+
+        try {
+            $supabase = app(SupabaseStorageService::class);
+
+            $tmpFile = tempnam(sys_get_temp_dir(), 'test_');
+            imagejpeg(imagecreatetruecolor(10, 10), $tmpFile);
+            $result['step'] = 'created test image';
+            $result['tmp_file'] = $tmpFile;
+
+            $response = Http::withoutVerifying()
+                ->timeout(15)
+                ->withHeaders([
+                    'Authorization' => 'Bearer ' . config('supabase.key'),
+                ])
+                ->attach('file', file_get_contents($tmpFile), 'test.jpg')
+                ->put(config('supabase.url') . '/storage/v1/object/' . config('supabase.bucket') . '/test/upload-check.jpg');
+
+            @unlink($tmpFile);
+
+            $result['step'] = 'uploaded to supabase';
+            $result['supabase_status'] = $response->status();
+            $result['supabase_body'] = $response->json() ?? $response->body();
+
+            if ($response->successful()) {
+                $deleteResponse = Http::withoutVerifying()
+                    ->timeout(10)
+                    ->withHeaders([
+                        'Authorization' => 'Bearer ' . config('supabase.key'),
+                    ])
+                    ->delete(config('supabase.url') . '/storage/v1/object/' . config('supabase.bucket') . '/test/upload-check.jpg');
+
+                $result['step'] = 'cleanup done';
+                $result['delete_status'] = $deleteResponse->status();
+                $result['ok'] = true;
+                $result['message'] = 'Supabase upload + delete BERHASIL';
+            } else {
+                $result['message'] = 'Supabase upload GAGAL — cek supabase_body';
+            }
+        } catch (\Throwable $e) {
+            $result['exception'] = get_class($e);
+            $result['message'] = $e->getMessage();
+            $result['step'] = 'error at: ' . ($result['step'] ?? 'unknown');
+        }
+
+        return response()->json($result, $result['ok'] ? 200 : 500);
+    }
+}
