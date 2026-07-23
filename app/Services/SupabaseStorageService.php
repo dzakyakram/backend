@@ -22,21 +22,22 @@ class SupabaseStorageService
     {
         $bucket      = $bucket ?? $this->bucket;
         $destination = $destination ?? basename($filePath);
-        $mimeType    = mime_content_type($filePath);
-        $contents    = file_get_contents($filePath);
 
-        $response = Http::withHeaders([
-            'Authorization' => "Bearer {$this->key}",
-            'Content-Type'  => $mimeType,
-        ])->withBody($contents, 'binary')
-          ->put("{$this->url}/storage/v1/object/{$bucket}/{$destination}");
+        $response = Http::withoutVerifying()
+            ->timeout(30)
+            ->withHeaders([
+                'Authorization' => "Bearer {$this->key}",
+            ])
+            ->attach('file', file_get_contents($filePath), basename($filePath))
+            ->put("{$this->url}/storage/v1/object/{$bucket}/{$destination}");
 
         if ($response->failed()) {
             Log::error('Supabase upload failed', [
                 'status' => $response->status(),
                 'body'   => $response->body(),
+                'dest'   => $destination,
             ]);
-            throw new \RuntimeException('Gagal upload file ke Supabase Storage.');
+            throw new \RuntimeException('Gagal upload ke Supabase: ' . $response->body());
         }
 
         $publicUrl = "{$this->url}/storage/v1/object/public/{$bucket}/{$destination}";
@@ -51,9 +52,12 @@ class SupabaseStorageService
     {
         $bucket = $bucket ?? $this->bucket;
 
-        $response = Http::withHeaders([
-            'Authorization' => "Bearer {$this->key}",
-        ])->delete("{$this->url}/storage/v1/object/{$bucket}/{$path}");
+        $response = Http::withoutVerifying()
+            ->timeout(10)
+            ->withHeaders([
+                'Authorization' => "Bearer {$this->key}",
+            ])
+            ->delete("{$this->url}/storage/v1/object/{$bucket}/{$path}");
 
         if ($response->failed()) {
             Log::error('Supabase delete failed', [
