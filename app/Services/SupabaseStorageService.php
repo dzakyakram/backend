@@ -23,6 +23,12 @@ class SupabaseStorageService
         $bucket      = $bucket ?? $this->bucket;
         $destination = $destination ?? basename($filePath);
 
+        if (empty($this->url) || empty($this->key)) {
+            throw new \RuntimeException(
+                'Supabase config belum terbaca. Pastikan SUPABASE_URL dan SUPABASE_SERVICE_KEY sudah di-set di Railway Variables.'
+            );
+        }
+
         $response = Http::withoutVerifying()
             ->timeout(30)
             ->withHeaders([

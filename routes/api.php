@@ -16,6 +16,17 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
 
+    // ── Debug (HAPUS SETELAH VERIFIKASI) ──────────────────────
+    Route::get('debug/config', function () {
+        return response()->json([
+            'supabase_url'   => config('supabase.url') ?? 'NULL - TIDAK TERBACA',
+            'supabase_key'   => config('supabase.key') ? '✓ ada' : 'NULL - TIDAK TERBACA',
+            'supabase_bucket'=> config('supabase.bucket') ?? 'NULL - TIDAK TERBACA',
+            'php_version'    => phpversion(),
+            'laravel_version'=> app()->version(),
+        ]);
+    });
+
     // ── Auth (tanpa token) ────────────────────────────────────
     Route::prefix('auth')->group(function () {
         Route::post('login',    [AuthApiController::class, 'login']);
